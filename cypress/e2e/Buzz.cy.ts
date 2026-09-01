@@ -17,7 +17,7 @@ describe("Buzz Page Tests", () => {
       cy.url().should("eq", "https://opensource-demo.orangehrmlive.com/web/index.php/buzz/viewBuzz");
       cy.get(".orangehrm-buzz-create-post").find(".oxd-buzz-post-input").type(data.postText);
       cy.get(".orangehrm-buzz-create-post").find("button").contains("Post").click();
-      cy.get(".orangehrm-buzz-post-body-text") .contains(data.postText).should("be.visible");
+      cy.get(".orangehrm-buzz-post-body-text").contains(data.postText).should("be.visible");
     });
   });
 
