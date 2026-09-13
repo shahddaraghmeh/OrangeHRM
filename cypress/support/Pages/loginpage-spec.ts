@@ -13,7 +13,7 @@ export class LoginPage {
   static dashboardUrl = "https://opensource-demo.orangehrmlive.com/web/index.php/dashboard/index";
 
 
-  static goToLoginPage() {
+  static visit() {
     cy.visit(this.pageUrl);
   }
 

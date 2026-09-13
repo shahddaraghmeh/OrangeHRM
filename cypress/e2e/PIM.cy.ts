@@ -1,14 +1,14 @@
 import { faker } from "@faker-js/faker";
-import { LoginPage } from "../support/Pages/LoginPage";
-import { PIMPage } from "../support/Pages/PimPage";
+import { LoginPage } from "@cypress/support/Pages/loginpage-spec";
+import { PIMPage } from "@cypress/support/Pages/pimpage-spec";
 
 describe("PIM Page Tests", () => {
   const Username = "Admin";
   const Password = "admin123";
-  let employeeId: number;
+  let employeeId: string;
 
   beforeEach(() => {
-    LoginPage.goToLoginPage();
+    LoginPage.visit();
     LoginPage.login(Username, Password);
   });
 
@@ -16,8 +16,9 @@ describe("PIM Page Tests", () => {
     if (!employeeId) return;
     cy.clearCookies();
     cy.clearLocalStorage();
-    LoginPage.goToLoginPage();
+    LoginPage.visit();
     LoginPage.login(Username, Password);
+
     PIMPage.goToPIM();
     PIMPage.searchEmployeeById(employeeId);
     PIMPage.deleteFoundEmployee();

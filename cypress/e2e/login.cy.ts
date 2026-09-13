@@ -1,4 +1,4 @@
-import { LoginPage } from "../support/Pages/LoginPage";
+import { LoginPage } from "@cypress/support/Pages/loginpage-spec";
 
 describe("Login Page Tests", () => {
 

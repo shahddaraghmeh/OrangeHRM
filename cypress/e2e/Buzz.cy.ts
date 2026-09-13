@@ -1,5 +1,5 @@
-import { LoginPage } from "../support/Pages/LoginPage";
-import { BuzzPage } from "../support/Pages/BuzzPage";
+import { LoginPage } from "@cypress/support/Pages/loginpage-spec";
+import { BuzzPage } from "@cypress/support/Pages/buzzpage-spec";
 
 describe("Buzz Page Tests", () => {
 
@@ -7,12 +7,17 @@ describe("Buzz Page Tests", () => {
   const password = "admin123";
 
   beforeEach(() => {
-    LoginPage.goToLoginPage();
+    LoginPage.visit();
     LoginPage.login(username, password);
   });
 
   it("TC07: Verify user can create a post using fixture data", () => {
-    BuzzPage.goToBuzz();
-    BuzzPage.createPostFromFixture("BuzzPost.json");
+    cy.fixture("BuzzPost.json").then((data) => {
+
+      BuzzPage.goToBuzzPage();
+      BuzzPage.typePost(data.postText);
+      BuzzPage.clickPostButton();
+      BuzzPage.checkPostIsVisible(data.postText);
+    });
   });
 });

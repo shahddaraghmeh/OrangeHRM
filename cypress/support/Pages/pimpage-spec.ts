@@ -24,8 +24,6 @@ export class PIMPage {
         cy.get(this.employeeForm).find('input[name="middleName"]').type(middleName);
         cy.get(this.employeeForm).find('input[name="lastName"]').type(lastName);
     }
-
-    // turn on the "create login details" switch
     static enableLoginDetails() {
         cy.get(this.employeeForm).find(".oxd-switch-input").click();
     }
@@ -43,14 +41,17 @@ export class PIMPage {
         cy.get(this.employeeForm).find('input[type="password"]').eq(0).type(password);
         cy.get(this.employeeForm).find('input[type="password"]').eq(1).type(password);
     }
-    static saveNewEmployee(onSaved: (empId: number) => void) {
+
+    static saveNewEmployee(onSaved: (empId: string) => void) {
         cy.intercept("POST", "**/web/index.php/api/v2/pim/employees").as("createEmployee");
         cy.contains("button", "Save").click();
         cy.get(this.errorMsg).should("not.exist");
 
         cy.wait("@createEmployee").then((interception) => {
+            //console.log("Interception:", interception);
             expect(interception.response?.statusCode).to.eq(200);
-            onSaved(interception.response!.body.data.empNumber);
+            // console.log("DATA:", interception.response!.body.data);
+            onSaved(interception.response!.body.data.employeeId);
         });
     }
 
@@ -110,7 +111,7 @@ export class PIMPage {
         cy.contains("label", employee.gender).find("input[type='radio']").should("be.checked");
     }
 
-    static searchEmployeeById(employeeId: number) {
+    static searchEmployeeById(employeeId: string) {
         cy.contains("label", "Employee Id").parents(this.inputGroup).find("input").type(String(employeeId));
 
         cy.intercept("GET", "**/api/v2/pim/employees*").as("searchResult");
