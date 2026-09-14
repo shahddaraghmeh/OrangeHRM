@@ -1,6 +1,6 @@
 import { faker } from "@faker-js/faker";
-import { LoginPage } from "@cypress/support/Pages/loginpage-spec";
-import { PIMPage } from "@cypress/support/Pages/pimpage-spec";
+import { LoginPage } from "@cypress/support/Pages/loginpage";
+import { PIMPage } from "@cypress/support/Pages/pimpage";
 
 describe("PIM Page Tests", () => {
   const Username = "Admin";

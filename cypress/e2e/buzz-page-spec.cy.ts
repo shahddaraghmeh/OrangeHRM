@@ -1,5 +1,5 @@
-import { LoginPage } from "@cypress/support/Pages/loginpage-spec";
-import { BuzzPage } from "@cypress/support/Pages/buzzpage-spec";
+import { LoginPage } from "@cypress/support/Pages/loginpage";
+import { BuzzPage } from "@cypress/support/Pages/buzzpage";
 
 describe("Buzz Page Tests", () => {
 
