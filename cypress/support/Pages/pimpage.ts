@@ -48,9 +48,7 @@ export class PIMPage {
         cy.get(LOCATORS.errorMsg).should("not.exist");
 
         cy.wait("@createEmployee").then((interception) => {
-            //console.log("Interception:", interception);
             expect(interception.response?.statusCode).to.eq(200);
-            // console.log("DATA:", interception.response!.body.data);
             onSaved(interception.response!.body.data.employeeId);
         });
     }

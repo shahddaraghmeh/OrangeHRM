@@ -3,7 +3,8 @@ import { LoginPage } from "@cypress/support/Pages/loginpage";
 import { PIMPage } from "@cypress/support/Pages/pimpage";
 
 describe("PIM Page Tests", () => {
-  const Username = "Admin";
+  const username = "Admin";
+  const password = "admin123";
   const Password = "admin123";
   let employeeId: string;
 
