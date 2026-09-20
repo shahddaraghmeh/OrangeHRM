@@ -49,7 +49,6 @@ export class PIMPage {
 
         cy.wait("@createEmployee").then((interception) => {
             expect(interception.response?.statusCode).to.eq(200);
-            // console.log("DATA:", interception.response!.body.data);
             onSaved(interception.response!.body.data.employeeId);
         });
     }
