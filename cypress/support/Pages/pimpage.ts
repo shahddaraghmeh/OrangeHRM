@@ -1,31 +1,66 @@
-const LOCATORS = {
-    menuItem: "span.oxd-main-menu-item--name",
-    addBtn: "button.oxd-button--secondary",
-    employeeForm: ".orangehrm-employee-form",
-    errorMsg: ".oxd-input-field-error-message",
-    inputGroup: ".oxd-input-group",
-    userDropdown: ".oxd-userdropdown-tab",
-    tableActions: ".oxd-table-cell-actions",
-}
+import {
+    interceptCreateEmployee,
+    interceptEmployees,
+    waitForEmployeeCreation,
+    waitForEmployees,
+
+} from "@cypress/support/helpers/api-helpers";
+
+import {
+    getInputGroup,
+    selectOption,
+} from "@cypress/support/helpers/common-helpers";
+
+import { LOCATORS } from "@cypress/support/helpers/constants";
+
 export class PIMPage {
-
-
     static goToPIM() {
-        cy.intercept("GET", "**/web/index.php/api/v2/pim/employees*").as("getEmployees");
-        cy.get(LOCATORS.menuItem).contains("PIM").click();
-        cy.wait("@getEmployees").its("response.statusCode").should("eq", 200);
+        interceptEmployees();
+
+        cy.get(LOCATORS.menuItem)
+            .contains("PIM")
+            .click();
+
+        waitForEmployees();
     }
 
     static clickAddEmployee() {
-        cy.get(LOCATORS.addBtn).contains("Add").click();
+        cy.get(LOCATORS.addButton)
+            .contains("Add")
+            .click();
     }
-    static fillNames(firstName: string, middleName: string, lastName: string) {
-        cy.get(LOCATORS.employeeForm).find('input[name="firstName"]').type(firstName);
-        cy.get(LOCATORS.employeeForm).find('input[name="middleName"]').type(middleName);
-        cy.get(LOCATORS.employeeForm).find('input[name="lastName"]').type(lastName);
+
+    static goToMyInfo() {
+        cy.contains("My Info").click();
     }
+
+    static logout() {
+        cy.get(LOCATORS.userDropdown).click();
+        cy.contains("Logout").click();
+    }
+
+    static fillNames(
+        firstName: string,
+        middleName: string,
+        lastName: string,
+    ) {
+        cy.get(LOCATORS.employeeForm)
+            .find('input[name="firstName"]')
+            .type(firstName);
+
+        cy.get(LOCATORS.employeeForm)
+            .find('input[name="middleName"]')
+            .type(middleName);
+
+        cy.get(LOCATORS.employeeForm)
+            .find('input[name="lastName"]')
+            .type(lastName);
+    }
+
     static enableLoginDetails() {
-        cy.get(LOCATORS.employeeForm).find(".oxd-switch-input").click();
+        cy.get(LOCATORS.employeeForm)
+            .find(".oxd-switch-input")
+            .click();
     }
 
     static typeUsername(username: string) {
@@ -38,57 +73,72 @@ export class PIMPage {
     }
 
     static typePasswords(password: string) {
-        cy.get(LOCATORS.employeeForm).find('input[type="password"]').eq(0).type(password);
-        cy.get(LOCATORS.employeeForm).find('input[type="password"]').eq(1).type(password);
+        cy.get(LOCATORS.employeeForm)
+            .find('input[type="password"]')
+            .eq(0)
+            .type(password);
+
+        cy.get(LOCATORS.employeeForm)
+            .find('input[type="password"]')
+            .eq(1)
+            .type(password);
     }
 
-    static saveNewEmployee(onSaved: (empId: string) => void) {
-        cy.intercept("POST", "**/web/index.php/api/v2/pim/employees").as("createEmployee");
+    static saveNewEmployee(
+        onSaved: (employeeId: string) => void,
+    ) {
+        interceptCreateEmployee();
+
         cy.contains("button", "Save").click();
-        cy.get(LOCATORS.errorMsg).should("not.exist");
 
-        cy.wait("@createEmployee").then((interception) => {
-            expect(interception.response?.statusCode).to.eq(200);
-            onSaved(interception.response!.body.data.employeeId);
-        });
+        cy.get(LOCATORS.errorMessage)
+            .should("not.exist");
+
+        waitForEmployeeCreation(onSaved);
     }
+    static checkNameFieldsFilled(
+        firstName: string,
+        middleName: string,
+        lastName: string,
+    ) {
+        getInputGroup("Employee Id")
+            .find("input")
+            .should("not.have.value", "");
 
-    static checkNameFieldsFilled(firstName: string, middleName: string, lastName: string) {
-        cy.contains("label", "Employee Id").parents(LOCATORS.inputGroup).find("input").should("not.have.value", "");
-        cy.get('input[name="firstName"]').should("have.value", firstName);
-        cy.get('input[name="middleName"]').should("have.value", middleName);
-        cy.get('input[name="lastName"]').should("have.value", lastName);
+        cy.get('input[name="firstName"]')
+            .should("have.value", firstName);
+
+        cy.get('input[name="middleName"]')
+            .should("have.value", middleName);
+
+        cy.get('input[name="lastName"]')
+            .should("have.value", lastName);
     }
 
     static selectNationality(nationality: string) {
-        cy.contains("label", "Nationality").parents(LOCATORS.inputGroup).find(".oxd-select-text").click();
-        cy.contains(nationality).click();
+        selectOption("Nationality", nationality);
     }
 
     static selectMaritalStatus(status: string) {
-        cy.contains("label", "Marital Status").parents(LOCATORS.inputGroup).find(".oxd-select-text").click();
-        cy.contains(status).click();
+        selectOption("Marital Status", status);
     }
 
     static typeDateOfBirth(date: string) {
-        cy.contains("label", "Date of Birth").closest(LOCATORS.inputGroup).find(".oxd-date-input input").type(date);
+        getInputGroup("Date of Birth")
+            .find(".oxd-date-input input")
+            .type(date);
     }
 
     static selectGender(gender: string) {
-        cy.contains("label", gender).find("input[type='radio']").check({ force: true });
+        cy.contains("label", gender)
+            .find("input[type='radio']")
+            .check({ force: true });
     }
 
     static savePersonalDetails() {
-        cy.contains('button[type="submit"]', "Save").first().click();
-    }
-
-    static logout() {
-        cy.get(LOCATORS.userDropdown).click();
-        cy.contains("Logout").click();
-    }
-
-    static goToMyInfo() {
-        cy.contains("My Info").click();
+        cy.contains('button[type="submit"]', "Save")
+            .first()
+            .click();
     }
 
     static checkPersonalDetails(employee: {
@@ -100,26 +150,118 @@ export class PIMPage {
         dateOfBirth: string;
         gender: string;
     }) {
-        cy.get('input[name="firstName"]').should("have.value", employee.firstName);
-        cy.get('input[name="middleName"]').should("have.value", employee.middleName);
-        cy.get('input[name="lastName"]').should("have.value", employee.lastName);
-        cy.contains("label", "Nationality").parents(LOCATORS.inputGroup).find(".oxd-select-text").should("contain.text", employee.nationality);
-        cy.contains("label", "Marital Status").parents(LOCATORS.inputGroup).find(".oxd-select-text").should("contain.text", employee.maritalStatus);
-        cy.contains("label", "Date of Birth").closest(LOCATORS.inputGroup).find(".oxd-date-input input").should("have.value", employee.dateOfBirth);
-        cy.contains("label", employee.gender).find("input[type='radio']").should("be.checked");
+        cy.get('input[name="firstName"]')
+            .should("have.value", employee.firstName);
+
+        cy.get('input[name="middleName"]')
+            .should("have.value", employee.middleName);
+
+        cy.get('input[name="lastName"]')
+            .should("have.value", employee.lastName);
+
+        getInputGroup("Nationality")
+            .find(".oxd-select-text")
+            .should(
+                "contain.text",
+                employee.nationality,
+            );
+
+        getInputGroup("Marital Status")
+            .find(".oxd-select-text")
+            .should(
+                "contain.text",
+                employee.maritalStatus,
+            );
+
+        getInputGroup("Date of Birth")
+            .find(".oxd-date-input input")
+            .should(
+                "have.value",
+                employee.dateOfBirth,
+            );
+
+        cy.contains("label", employee.gender)
+            .find("input[type='radio']")
+            .should("be.checked");
     }
 
     static searchEmployeeById(employeeId: string) {
-        cy.contains("label", "Employee Id").parents(LOCATORS.inputGroup).find("input").type(String(employeeId));
+        getInputGroup("Employee Id")
+            .find("input")
+            .type(String(employeeId));
 
-        cy.intercept("GET", "**/api/v2/pim/employees*").as("searchResult");
+        cy.intercept(
+            "GET",
+            "**/api/v2/pim/employees*",
+        ).as("searchResult");
+
         cy.contains("button", "Search").click();
+
         cy.wait("@searchResult");
     }
 
+    static openEmployee(employeeId: string) {
+        PIMPage.searchEmployeeById(employeeId);
+
+        cy.get(LOCATORS.tableActions)
+            .find("button")
+            .first()
+            .click();
+    }
+
     static deleteFoundEmployee() {
-        cy.get(LOCATORS.tableActions).find("button").eq(1).click();
-        cy.contains("button", "Yes, Delete").click();
-        cy.contains("Successfully Deleted").should("be.visible");
+        cy.get(LOCATORS.tableActions)
+            .find("button")
+            .eq(1)
+            .click();
+
+        cy.contains("button", "Yes, Delete")
+            .click();
+
+        cy.contains("Successfully Deleted")
+            .should("be.visible");
+    }
+
+    static uploadProfilePicture(fileName: string) {
+        cy.get(LOCATORS.fileInput)
+            .selectFile(
+                `cypress/fixtures/${fileName}`,
+                { force: true },
+            );
+    }
+
+    static openAttachments() {
+        cy.get(LOCATORS.attachmentButton)
+            .find("i.bi-plus")
+            .parent()
+            .should("be.visible")
+            .click();
+    }
+
+    static uploadAttachment(fileName: string) {
+        cy.get(LOCATORS.fileInput)
+            .selectFile(`cypress/fixtures/${fileName}`, { force: true });
+    }
+
+    static saveAttachment() {
+        cy.get(LOCATORS.fileInput)
+            .parents("form")
+            .within(() => {
+                cy.contains("button", "Save").click();
+            });
+    }
+
+    static downloadAttachment() {
+        cy.get(LOCATORS.tableActions)
+            .find("button")
+            .first()
+            .click();
+    }
+
+    static validateDownloadedFile(fileName: string) {
+        const filePath =
+            `${Cypress.config("downloadsFolder")}/${fileName}`;
+
+
     }
 }
