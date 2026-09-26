@@ -1,20 +1,22 @@
 /// <reference types="cypress" />
 
+import { LOCATORS } from "@cypress/support/helpers/constants";
+
 Cypress.Commands.add("login", (username: string, password: string) => {
-  cy.clearCookies();
-  cy.clearLocalStorage();
+
   cy.visit(
     "https://opensource-demo.orangehrmlive.com/web/index.php/auth/login",
   );
 
-  cy.get('input[name="username"]').type(username);
-  cy.get('input[name="password"]').type(password);
-  cy.get('button[type="submit"]').click();
+  cy.get(LOCATORS.usernameField).type(username);
+  cy.get(LOCATORS.passwordField).type(password);
+  cy.get(LOCATORS.submitButton).click();
+  //cy.url({ timeout: 15000 }).should("include", "/dashboard");
 });
 
 Cypress.Commands.add("logout", () => {
-  cy.get(".oxd-userdropdown-tab").click();
-  cy.get('a[href="/web/index.php/auth/logout"]').click();
+  cy.get(LOCATORS.userDropdown).click();
+  cy.get(LOCATORS.logoutLink).click();
 });
 
 declare global {

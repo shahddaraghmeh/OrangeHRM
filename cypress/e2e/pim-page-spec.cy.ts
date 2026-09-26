@@ -1,23 +1,20 @@
 import { faker } from "@faker-js/faker";
-import { PIMPage } from "@cypress/support/Pages/pimpage";
+import { PIMPage } from "@cypress/support/Pages/pim-page";
+import { selectOption } from "@cypress/support/helpers/common-helpers";
 
 describe("PIM Page Tests", () => {
   const username = "Admin";
-  const password = "admin123";
+  const Password = "admin123";
   let employeeId = "";
 
   beforeEach(() => {
     employeeId = "";
-    cy.login(username, password);
+    cy.login(username, Password);
   });
 
   afterEach(() => {
-    if (!employeeId) return;
-
-    cy.clearCookies();
-    cy.clearLocalStorage();
-
-    cy.login(username, password);
+    cy.logout();
+    cy.login(username, Password);
 
     PIMPage.goToPIM();
     PIMPage.searchEmployeeById(employeeId);
@@ -44,9 +41,7 @@ describe("PIM Page Tests", () => {
       PIMPage.typeUsername(newUsername);
       PIMPage.typePasswords(employee.password);
 
-      PIMPage.saveNewEmployee((empId) => {
-        employeeId = empId;
-      });
+      PIMPage.saveNewEmployee();
 
       PIMPage.checkNameFieldsFilled(
         employee.firstName,
@@ -54,8 +49,8 @@ describe("PIM Page Tests", () => {
         employee.lastName,
       );
 
-      PIMPage.selectNationality(employee.nationality);
-      PIMPage.selectMaritalStatus(employee.maritalStatus);
+      selectOption("Nationality", employee.nationality);
+      selectOption("Marital Status", employee.maritalStatus);
       PIMPage.typeDateOfBirth(employee.dateOfBirth);
       PIMPage.selectGender(employee.gender);
       PIMPage.savePersonalDetails();
@@ -80,7 +75,7 @@ describe("PIM Page Tests", () => {
         employee.lastName,
       );
 
-      PIMPage.uploadProfilePicture("profile-picture.jpg");
+      PIMPage.uploadFile("profile-picture.jpg");
 
       PIMPage.enableLoginDetails();
 
@@ -90,18 +85,16 @@ describe("PIM Page Tests", () => {
 
       PIMPage.typeUsername(newUsername);
       PIMPage.typePasswords(employee.password);
-      PIMPage.saveNewEmployee((empId) => {
-        employeeId = empId;
-      });
+      PIMPage.saveNewEmployee();
 
-      PIMPage.selectNationality(employee.nationality);
-      PIMPage.selectMaritalStatus(employee.maritalStatus);
+      selectOption("Nationality", employee.nationality);
+      selectOption("Marital Status", employee.maritalStatus);
       PIMPage.typeDateOfBirth(employee.dateOfBirth);
       PIMPage.selectGender(employee.gender);
       PIMPage.savePersonalDetails();
 
       PIMPage.openAttachments();
-      PIMPage.uploadAttachment("attachments/employee.xlsx");
+      PIMPage.uploadFile("attachments/employee.xlsx");
       PIMPage.saveAttachment();
 
       PIMPage.downloadAttachment();
@@ -110,6 +103,9 @@ describe("PIM Page Tests", () => {
       cy.logout();
 
       cy.login(newUsername, employee.password);
+
+      PIMPage.goToMyInfo();
+      PIMPage.checkPersonalDetails(employee);
     });
   });
 });
