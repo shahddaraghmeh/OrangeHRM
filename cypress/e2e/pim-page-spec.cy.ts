@@ -1,21 +1,20 @@
 import { faker } from "@faker-js/faker";
-import { PIMPage } from "@cypress/support/Pages/pim-page";
-import { selectOption } from "@cypress/support/helpers/common-helpers";
+import { PIMPage } from "@cypress/support/pages/pim-page";
 
 describe("PIM Page Tests", () => {
-  const username = "Admin";
-  const Password = "admin123";
+  const userName = "Admin";
+  const password = "admin123";
   let employeeId = "";
-
+  const attachmentFileName = "employee.xlsx";
+  const profilePictureFileName = "profile-picture.jpg";
   beforeEach(() => {
     employeeId = "";
-    cy.login(username, Password);
+    cy.login(userName, password);
   });
 
   afterEach(() => {
     cy.logout();
-    cy.login(username, Password);
-
+    cy.login(userName, password);
     PIMPage.goToPIM();
     PIMPage.searchEmployeeById(employeeId);
     PIMPage.deleteFoundEmployee();
@@ -41,7 +40,9 @@ describe("PIM Page Tests", () => {
       PIMPage.typeUsername(newUsername);
       PIMPage.typePasswords(employee.password);
 
-      PIMPage.saveNewEmployee();
+      PIMPage.saveNewEmployee((empId) => {
+        employeeId = empId;
+      });
 
       PIMPage.checkNameFieldsFilled(
         employee.firstName,
@@ -49,11 +50,7 @@ describe("PIM Page Tests", () => {
         employee.lastName,
       );
 
-      selectOption("Nationality", employee.nationality);
-      selectOption("Marital Status", employee.maritalStatus);
-      PIMPage.typeDateOfBirth(employee.dateOfBirth);
-      PIMPage.selectGender(employee.gender);
-      PIMPage.savePersonalDetails();
+      PIMPage.fillPersonalDetails(employee);
 
       cy.logout();
 
@@ -75,7 +72,7 @@ describe("PIM Page Tests", () => {
         employee.lastName,
       );
 
-      PIMPage.uploadFile("profile-picture.jpg");
+      PIMPage.uploadFile(`attachments/${profilePictureFileName}`);
 
       PIMPage.enableLoginDetails();
 
@@ -85,20 +82,17 @@ describe("PIM Page Tests", () => {
 
       PIMPage.typeUsername(newUsername);
       PIMPage.typePasswords(employee.password);
-      PIMPage.saveNewEmployee();
+      PIMPage.saveNewEmployee((empId) => {
+        employeeId = empId;
+      });
 
-      selectOption("Nationality", employee.nationality);
-      selectOption("Marital Status", employee.maritalStatus);
-      PIMPage.typeDateOfBirth(employee.dateOfBirth);
-      PIMPage.selectGender(employee.gender);
-      PIMPage.savePersonalDetails();
-
+      PIMPage.fillPersonalDetails(employee);
       PIMPage.openAttachments();
-      PIMPage.uploadFile("attachments/employee.xlsx");
+      PIMPage.uploadFile(`attachments/${attachmentFileName}`);
       PIMPage.saveAttachment();
 
       PIMPage.downloadAttachment();
-      PIMPage.validateDownloadedFile("employee.xlsx");
+      PIMPage.verifyDownloadedFileExists(attachmentFileName);
 
       cy.logout();
 

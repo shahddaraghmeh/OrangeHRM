@@ -11,7 +11,7 @@ Cypress.Commands.add("login", (username: string, password: string) => {
   cy.get(LOCATORS.usernameField).type(username);
   cy.get(LOCATORS.passwordField).type(password);
   cy.get(LOCATORS.submitButton).click();
-  //cy.url({ timeout: 15000 }).should("include", "/dashboard");
+
 });
 
 Cypress.Commands.add("logout", () => {
