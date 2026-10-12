@@ -1,11 +1,14 @@
 import { defineConfig } from "cypress";
+import { allureCypress } from "allure-cypress/reporter";
 
 export default defineConfig({
-  allowCypressEnv: false,
-
+  projectId: "jhrwey",
   e2e: {
+    baseUrl: "https://opensource-demo.orangehrmlive.com",
     setupNodeEvents(on, config) {
-      // implement node event listeners here
+      allureCypress(on, config);
+
+      return config;
     },
   },
 });
